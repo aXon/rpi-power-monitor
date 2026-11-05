@@ -24,8 +24,8 @@
 #                       ct3 -> channel_4, ct4 -> channel_5, ct5 -> channel_6
 [current_transformers]
     [current_transformers.channel_1]
-        name = "Hauptanschluss"
-        rating = 100            # ANPASSEN: Nennstrom der Zange in A (z. B. 100 für SCT-013-000)
+        name = "Hauptanschluss"   # vermutlich Kanal 1, am Pi mit --mode terminal prüfen
+        rating = 100            # ggf. ANPASSEN: Nennstrom der Zange in A (z. B. 100 für SCT-013-000)
         type = "mains"
         two_pole = false
         enabled = true
@@ -81,7 +81,7 @@
 [plugins]
     [plugins.mqtt_v2]
         enabled = true
-        host = "HA_IP_ANPASSEN"     # IP des Home-Assistant-Hosts (Mosquitto-Add-on)
+        host = "10.23.5.233"        # Home Assistant mit Mosquitto-Add-on
         username = "powerpi"        # MQTT-Benutzer in HA
         password = "ANPASSEN"
         prefix = "powermon"
