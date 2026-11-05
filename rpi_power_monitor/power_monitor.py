@@ -77,16 +77,23 @@ class RPiPowerMonitor:
             self.spi.open(0, 0)
             self.spi.max_speed_hz = 1750000
         
-        # Get DB Client
-        self.get_db_client()
-        if not self.client:
-            logger.error(f"Failed to connect to InfluxDB server at {self.config['database']['host']}:{self.config['database']['port']}. Please make sure it's reachable and try again.")
-            self.cleanup(-1)
-        
+        # Get DB Client (InfluxDB is optional: set `enabled = false` in the [database] section to run without it,
+        # e.g. when data is only exported through plugins such as mqtt_v2)
+        self.client = None
+        self.db_enabled = self.config.get('database', {}).get('enabled', True)
+        if self.db_enabled:
+            self.get_db_client()
+            if not self.client:
+                logger.error(f"Failed to connect to InfluxDB server at {self.config['database']['host']}:{self.config['database']['port']}. Please make sure it's reachable and try again.")
+                self.cleanup(-1)
+
+            # Validate continuous queries and retention policies
+            self.validate_rps()
+            self.validate_cqs()
+        else:
+            logger.info("InfluxDB is disabled in config.toml ([database] enabled = false). Measurements are only passed to plugins.")
+
         # Other Initializations
-        # Validate continuous queries and retention policies
-        self.validate_rps()
-        self.validate_cqs()        
         self.points_buffer = [] # A buffer to hold sublists of points so that they can be written altogether (reduces DB overhead)
         self.def_cal = 0.88     # This is the default calibration factor for all CTs from my shop.
         self.terminal_mode = False
@@ -1015,6 +1022,8 @@ class RPiPowerMonitor:
 
     def queue_for_influx(self, SMA_Values, poll_time):
         '''Creates Point() objects from the measured values, and caches them into a small batch before writing to Influx.'''
+        if not self.db_enabled:
+            return
 
         # Create Points() for every measurement.
         ct_points = []

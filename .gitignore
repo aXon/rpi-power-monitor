@@ -1,0 +1,3 @@
+rpi_power_monitor/config.toml
+__pycache__/
+*.pyc

@@ -1,0 +1,93 @@
+# Beispielkonfiguration für den power-pi (Hauptanschluss, ohne InfluxDB, Ausgabe per MQTT an Home Assistant)
+# Kopieren nach rpi_power_monitor/config.toml und die mit "ANPASSEN" markierten Werte setzen.
+
+[general]
+    name = "power-pi"
+
+[database]
+    # InfluxDB abgeschaltet: Messwerte gehen nur an die Plugins (mqtt_v2).
+    enabled = false
+    host = "localhost"
+    port = 8086
+    username = "root"
+    password = "password"
+    database_name = "power_monitor"
+
+[grid_voltage]
+    # Übernommen aus der alten config.py (Stand 2021)
+    grid_voltage = 242.5
+    ac_transformer_output_voltage = 10.61
+    voltage_calibration = 1.0620965128
+
+# Alle sechs Kanäle müssen vorhanden sein, auch wenn sie nicht benutzt werden.
+# Zuordnung alt -> neu: ct0 -> channel_1, ct1 -> channel_2, ct2 -> channel_3,
+#                       ct3 -> channel_4, ct4 -> channel_5, ct5 -> channel_6
+[current_transformers]
+    [current_transformers.channel_1]
+        name = "Hauptanschluss"
+        rating = 100            # ANPASSEN: Nennstrom der Zange in A (z. B. 100 für SCT-013-000)
+        type = "mains"
+        two_pole = false
+        enabled = true
+        calibration = 1.0
+        amps_cutoff_threshold = 0
+        reversed = false        # auf true setzen, falls die Leistung negativ angezeigt wird
+
+    [current_transformers.channel_2]
+        name = "Unbenutzt 2"
+        rating = 100
+        type = "consumption"
+        two_pole = false
+        enabled = false
+        calibration = 1.0
+        amps_cutoff_threshold = 0
+
+    [current_transformers.channel_3]
+        name = "Unbenutzt 3"
+        rating = 100
+        type = "consumption"
+        two_pole = false
+        enabled = false
+        calibration = 1.0
+        amps_cutoff_threshold = 0
+
+    [current_transformers.channel_4]
+        name = "Unbenutzt 4"
+        rating = 100
+        type = "consumption"
+        two_pole = false
+        enabled = false
+        calibration = 1.0
+        amps_cutoff_threshold = 0
+
+    [current_transformers.channel_5]
+        name = "Unbenutzt 5"
+        rating = 100
+        type = "consumption"
+        two_pole = false
+        enabled = false
+        calibration = 1.0
+        amps_cutoff_threshold = 0
+
+    [current_transformers.channel_6]
+        name = "Unbenutzt 6"
+        rating = 100
+        type = "consumption"
+        two_pole = false
+        enabled = false
+        calibration = 1.0
+        amps_cutoff_threshold = 0
+
+[plugins]
+    [plugins.mqtt_v2]
+        enabled = true
+        host = "HA_IP_ANPASSEN"     # IP des Home-Assistant-Hosts (Mosquitto-Add-on)
+        username = "powerpi"        # MQTT-Benutzer in HA
+        password = "ANPASSEN"
+        prefix = "powermon"
+        power_change = 5
+        voltage_change = 3
+        current_change = 1
+        pf_change = 0.05
+        refresh_rate = 5
+        max_publish_seconds = 600
