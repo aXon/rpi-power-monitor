@@ -842,7 +842,12 @@ class RPiPowerMonitor:
             'net' : {'power' : None, 'current' : None},
             'voltage' : None
         }
-        SMA_Window = 2      # This is the total number of calculations that are included in the simple-moving-average.
+        # Total number of calculations included in the simple-moving-average. Configurable via `sma_window` in [general].
+        SMA_Window = int(self.config.get('general', {}).get('sma_window', 10))
+        if SMA_Window < 1:
+            logger.warning(f"Invalid sma_window ({SMA_Window}) in config.toml - using 1.")
+            SMA_Window = 1
+        logger.info(f"Using a simple-moving-average window of {SMA_Window} calculations.")
         write_threshold = 2 # This controls how many SMA_Data updates are processed before the resulting simple-moving-average values are sent to be stored in the database.
         write_threshold_counter = 0 # Counter that keeps track of the number of SMA updates processed. When write_threshold_counter == write_threshold, the current SMA values will be sent to influx DB cache for eventual storage.
         num_samples = 500

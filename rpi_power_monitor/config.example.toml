@@ -3,6 +3,8 @@
 
 [general]
     name = "power-pi"
+    # Anzahl Messdurchläufe im gleitenden Mittelwert (Original: 2). Größer = ruhigere Werte, etwas mehr Verzögerung.
+    sma_window = 10
 
 [database]
     # InfluxDB abgeschaltet: Messwerte gehen nur an die Plugins (mqtt_v2).
